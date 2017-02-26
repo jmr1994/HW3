@@ -1,7 +1,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: White;
+  background: white;
   color: DarkSlateGrey;
   font-family: Tahoma, Verdana, sans-serif;
   font-size: 10pt;
@@ -58,4 +58,7 @@ form label {
   line-height: 25px;
   font-weight: bold;
   color: maroon;
+}
+table#movies th.hilite {
+  background-color: yellow;
 }
