@@ -12,23 +12,36 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = ['G','PG','PG-13','R','NC-17']
-    if params[:ratings]
-      @movies = Movie.where(rating:params[:ratings].keys)
+    @selected_ratings = @all_ratings
+    @title_hilight = 'hilite' if params[:sort] == 'title'
+    @release_hilight = 'hilite' if params[:sort] == 'release_date'
+    redirect = false
+    if !params[:sort].nil?
+      session[:sort] = params[:sort]
+    elsif !session[:sort].nil?
+      params[:sort] = session[:sort]
+      redirect = true
     end
-    if params[:ratings].nil?
-        @selected_ratings = ['G','PG','PG-13','R','NC-17']
-      else
-        @selected_ratings = params[:ratings].keys
-
+    if !params[:ratings].nil?
+      session[:ratings] = params[:ratings]
+    elsif !session[:ratings].nil?
+      params[:ratings] = session[:ratings]
+      redirect = true
     end
-    case params[:sort]
-      when 'title'
-        @movies = Movie.order('title ASC')
-        @title_hilight = 'hilite'
-      when 'release_date'
-        @movies = Movie.order('release_date ASC')
-        @release_hilight = 'hilite'
-      else params[:ratings]? @movies = Movie.where(rating: params[:ratings].keys):@movies = Movie.all
+    if redirect == true
+      flash.keep
+      redirect_to movies_path(:sort=>params[:sort], :ratings=>params[:ratings])
+    end
+    if params[:sort].nil?&&params[:ratings].nil?
+      @movies = Movie.all
+    elsif !params[:sort].nil?&&params[:ratings].nil?
+      @movies = Movie.order(params[:sort])
+    elsif params[:sort].nil?&&!params[:ratings].nil?
+      @selected_ratings = params[:ratings].keys
+      @movies = Movie.where(:rating=>params[:ratings].keys)
+    elsif !params[:sort].nil?&&!params[:ratings].nil?
+      @selected_ratings = params[:ratings].keys
+      @movies = Movie.order(params[:sort]).where(:rating=>params[:ratings].keys)
     end
   end
 
